@@ -4,8 +4,10 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// LogFormat dummy
 type LogFormat string
 
+// Logger struct
 type Logger struct {
 	*logrus.Entry
 	log    *logrus.Logger
@@ -13,10 +15,13 @@ type Logger struct {
 }
 
 const (
+	// JSONLogFormat dummy
 	JSONLogFormat LogFormat = "json"
+	// TextLogFormat dummy
 	TextLogFormat LogFormat = "text"
 )
 
+// New initialize logger
 func New(version, defaultVersion string) *Logger {
 	if version == "" {
 		version = defaultVersion
@@ -34,14 +39,17 @@ func New(version, defaultVersion string) *Logger {
 	}
 }
 
+// SetLogMode debug/info
 func (l *Logger) SetLogMode(level logrus.Level) {
 	l.log.SetLevel(level)
 }
 
+// EnableTrace dummy
 func (l *Logger) EnableTrace(trace bool) {
 	l.log.SetReportCaller(trace)
 }
 
+// SetLogFormatter text/json
 func (l *Logger) SetLogFormatter(format LogFormat) {
 	switch format {
 	case TextLogFormat:
@@ -52,6 +60,7 @@ func (l *Logger) SetLogFormatter(format LogFormat) {
 	l.Format = format
 }
 
+// GetLevel dummy
 func (l *Logger) GetLevel() logrus.Level {
 	return l.log.GetLevel()
 }

@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -9,6 +10,8 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/TwoFlower3/mng-template/pkg/logger"
+	"github.com/TwoFlower3/mng-template/pkg/models"
+	"github.com/TwoFlower3/mng-template/pkg/types"
 	"github.com/TwoFlower3/mng-template/pkg/utils"
 )
 
@@ -17,6 +20,8 @@ type Server struct {
 	log        *logger.Logger
 	httpServer *http.Server
 	db         *sqlx.DB
+
+	DB models.Datastore
 }
 
 // Options dummy
@@ -24,18 +29,7 @@ type Options struct {
 	Logger       *logger.Logger
 	WriteTimeout time.Duration
 	Address      string
-	DB           DBOptions
-}
-
-// DBOptions dummy
-type DBOptions struct {
-	Host        string
-	Port        string
-	SSLMode     string
-	MaxIdleConn int
-	Database    string
-	User        string
-	Password    string
+	DB           types.DBOptions
 }
 
 // New create server
@@ -56,7 +50,7 @@ func (server *Server) registerHandler() {
 	})
 }
 
-func (server *Server) connectDB(dbOptions DBOptions) error {
+func (server *Server) connectDB(dbOptions types.DBOptions) error {
 	server.log.WithFields(logrus.Fields{
 		"Host":         dbOptions.Host,
 		"Port":         dbOptions.Port,
@@ -66,6 +60,19 @@ func (server *Server) connectDB(dbOptions DBOptions) error {
 		"SSL Mode":     dbOptions.SSLMode,
 		"MaxIdleConns": dbOptions.MaxIdleConn,
 	}).Debug("Database params")
+
+	db, err := models.CreateDB(dbOptions.Host,
+		dbOptions.Port,
+		dbOptions.User,
+		dbOptions.Password,
+		dbOptions.Database,
+		dbOptions.SSLMode)
+	if err != nil {
+		return fmt.Errorf("connectDB error: %+v", err)
+	}
+
+	server.db = db.DB
+	server.DB = db
 
 	return nil
 }
